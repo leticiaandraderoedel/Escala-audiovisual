@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Plataforma AV — Escalas</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Inter:wght@400;500;600&family=Roboto:wght@400;500;700&family=Poppins:wght@400;500;600&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-main:#1c1c1e;--bg-card:#242428;--bg-input:#1a1a1e;
+  --border:#2a2a2a;--accent:#e63946;--accent2:#16213e;
+  --text-primary:#f0f0f0;--text-secondary:#888;
+  --font:'DM Sans',sans-serif;--font-size:13px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--bg-main);color:var(--text-primary);font-size:var(--font-size);}
+
+.topbar{background:#111;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.logo{font-size:15px;font-weight:600;color:var(--text-primary);letter-spacing:1px;}
+.logo span{color:var(--accent);}
+.topbar-right{display:flex;gap:8px;}
+
+.tabs{background:#161618;border-bottom:1px solid var(--border);display:flex;padding:0 12px;gap:2px;}
+.tab{padding:9px 16px;font-size:12px;font-weight:500;color:var(--text-secondary);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;}
+.tab.active{color:var(--text-primary);border-bottom-color:var(--accent);}
+.tab:hover:not(.active){color:var(--text-primary);}
+
+.toolbar{background:#161618;padding:8px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.tbtn{border:none;padding:5px 13px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:500;font-family:var(--font);}
+.tbtn-red{background:var(--accent);color:#fff;}
+.tbtn-red:hover{opacity:.88;}
+.tbtn-gray{background:#2a2a2e;border:1px solid #444;color:#ccc;}
+.tbtn-gray:hover{background:#3a3a3e;color:#fff;}
+
+.conflict-bar{background:#7a1c1c;color:#ffbaba;padding:7px 16px;font-size:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.conflict-bar.hidden{display:none;}
+.conflict-item{background:#9e2222;padding:2px 10px;border-radius:20px;font-size:11px;}
+
+.grid-wrap{overflow-x:auto;padding:12px 16px 20px;}
+.grid{display:flex;gap:10px;min-width:max-content;}
+
+.sala-col{background:var(--bg-card);border-radius:10px;overflow:hidden;min-width:220px;width:220px;border:1.5px solid var(--border);}
+.sala-col.conflict-col{border-color:var(--accent);}
+.sala-name-row{background:var(--accent);padding:7px 10px;display:flex;align-items:center;justify-content:space-between;}
+.sala-name{font-size:15px;font-weight:600;color:#fff;letter-spacing:1px;}
+.sala-controls{display:flex;gap:4px;}
+.sala-btn{background:rgba(255,255,255,0.2);border:none;color:#fff;width:22px;height:22px;border-radius:4px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;}
+.sala-btn:hover{background:rgba(255,255,255,0.35);}
+.sala-event-row{background:#1e1e22;padding:6px 10px;border-bottom:1px solid var(--border);}
+.sala-event-name{font-size:11px;color:#ccc;font-weight:500;}
+.sala-time{font-size:11px;color:var(--text-secondary);margin-top:1px;}
+.sala-photo{width:100%;height:80px;object-fit:cover;display:block;}
+.sala-photo-placeholder{width:100%;height:60px;background:#1e1e22;display:flex;align-items:center;justify-content:center;color:#444;font-size:11px;cursor:pointer;border-bottom:1px solid var(--border);}
+.sala-photo-placeholder:hover{background:#252528;color:#888;}
+
+.rows-area{padding:4px 0 8px;}
+.func-row{display:flex;align-items:center;padding:3px 8px;border-bottom:1px solid var(--border);}
+.func-row:last-child{border-bottom:none;}
+.func-select{width:92px;min-width:92px;border:none;border-radius:5px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;padding:5px 3px;font-family:var(--font);}
+.person-select{flex:1;margin-left:6px;background:var(--bg-input);border:1px solid #333;border-radius:5px;color:var(--text-primary);padding:3px 6px;font-size:12px;font-family:var(--font);cursor:pointer;min-width:0;}
+.person-select:focus{outline:none;border-color:var(--accent);}
+.person-select.conflict-select{border-color:var(--accent);background:#2a1010;}
+.person-select option{background:#1a1a1e;}
+.add-func-btn{width:100%;background:transparent;border:none;color:#555;padding:5px;font-size:11px;cursor:pointer;text-align:center;font-family:var(--font);}
+.add-func-btn:hover{color:#aaa;background:#2a2a2e;}
+.remove-row-btn{background:transparent;border:none;color:#555;cursor:pointer;font-size:13px;width:18px;padding:0;margin-left:2px;}
+.remove-row-btn:hover{color:var(--accent);}
+
+.tarefas-wrap{padding:16px;}
+.tarefas-grid{display:flex;gap:12px;flex-wrap:wrap;}
+.tarefa-col{background:var(--bg-card);border-radius:10px;min-width:260px;width:260px;border:1.5px solid var(--border);overflow:hidden;}
+.tarefa-col-header{padding:10px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);}
+.tarefa-col-title{font-size:13px;font-weight:600;}
+.tarefa-item{padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;}
+.tarefa-item:hover{background:#2a2a2e;}
+.tarefa-item:last-child{border-bottom:none;}
+.tarefa-title{font-size:13px;color:var(--text-primary);font-weight:500;}
+.tarefa-meta{font-size:11px;color:var(--text-secondary);margin-top:3px;display:flex;gap:8px;flex-wrap:wrap;}
+.tarefa-done .tarefa-title{text-decoration:line-through;color:var(--text-secondary);}
+.tarefa-photo{width:100%;height:60px;object-fit:cover;border-radius:4px;margin-top:5px;}
+.add-tarefa-btn{width:100%;background:transparent;border:none;color:#555;padding:8px;font-size:11px;cursor:pointer;text-align:center;font-family:var(--font);}
+.add-tarefa-btn:hover{color:#aaa;background:#2a2a2e;}
+
+.lembretes-wrap{padding:16px;}
+.lembretes-grid{display:flex;gap:10px;flex-wrap:wrap;}
+.lembrete-card{background:#2a2200;border:1.5px solid #5a4800;border-radius:10px;padding:14px;width:220px;position:relative;cursor:pointer;}
+.lembrete-card:hover{border-color:#8a6800;}
+.lembrete-card.urgente{background:#2a0a0a;border-color:#8a1a1a;}
+.lembrete-card.normal{background:#0a2a1a;border-color:#1a6a3a;}
+.lembrete-text{font-size:13px;color:var(--text-primary);line-height:1.5;word-break:break-word;}
+.lembrete-date{font-size:11px;color:var(--text-secondary);margin-top:8px;}
+.lembrete-del{position:absolute;top:6px;right:8px;background:none;border:none;color:#555;cursor:pointer;font-size:14px;}
+.lembrete-del:hover{color:var(--accent);}
+.lembrete-photo{width:100%;height:60px;object-fit:cover;border-radius:6px;margin-top:8px;}
+.add-lembrete-btn{background:transparent;border:2px dashed #444;border-radius:10px;width:220px;min-height:80px;color:#555;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;font-family:var(--font);}
+.add-lembrete-btn:hover{border-color:#888;color:#aaa;}
+
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;color:#555;font-size:13px;gap:8px;}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.78);display:flex;align-items:center;justify-content:center;z-index:999;}
+.modal{background:var(--bg-card);border-radius:12px;padding:22px;width:400px;max-width:96vw;border:1px solid #333;max-height:92vh;overflow-y:auto;}
+.modal h3{font-size:15px;font-weight:600;margin-bottom:14px;color:var(--text-primary);}
+.modal label{font-size:11px;color:var(--text-secondary);display:block;margin-bottom:4px;margin-top:10px;}
+.modal input,.modal select,.modal textarea{width:100%;background:var(--bg-input);border:1px solid #333;border-radius:6px;color:var(--text-primary);padding:7px 10px;font-size:13px;font-family:var(--font);}
+.modal textarea{resize:vertical;min-height:60px;}
+.modal input:focus,.modal select:focus,.modal textarea:focus{outline:none;border-color:var(--accent);}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;}
+.btn-cancel{background:#333;border:none;color:#ccc;padding:7px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-family:var(--font);}
+.btn-cancel:hover{background:#444;}
+.btn-confirm{background:var(--accent);border:none;color:#fff;padding:7px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;font-family:var(--font);}
+.btn-confirm:hover{opacity:.88;}
+.btn-danger{background:#7a1c1c;border:none;color:#ffbaba;padding:7px 16px;border-radius:6px;cursor:pointer;font-size:12px;font-family:var(--font);}
+
+.func-config-list{display:flex;flex-direction:column;gap:6px;margin:10px 0;}
+.func-config-item{display:flex;align-items:center;gap:8px;background:#1e1e22;border-radius:7px;padding:7px 10px;}
+.func-del-btn{background:none;border:none;color:#555;cursor:pointer;font-size:14px;}
+.func-del-btn:hover{color:var(--accent);}
+.pessoas-list{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0;}
+.pessoa-tag{background:#2a2a2e;border:1px solid #444;border-radius:4px;padding:2px 8px;font-size:11px;color:#ccc;display:flex;align-items:center;gap:4px;}
+.pessoa-tag button{background:none;border:none;color:#666;cursor:pointer;font-size:12px;}
+.pessoa-tag button:hover{color:var(--accent);}
+.photo-upload-area{border:2px dashed #444;border-radius:8px;padding:12px;text-align:center;cursor:pointer;color:#666;font-size:12px;margin-top:4px;}
+.photo-upload-area:hover{border-color:#888;color:#aaa;}
+.photo-preview{width:100%;max-height:100px;object-fit:cover;border-radius:6px;margin-top:6px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">PLATAFORMA <span>AV</span></div>
+  <div class="topbar-right">
+    <button class="tbtn tbtn-gray" onclick="openTema()">🎨 Tema</button>
+    <button class="tbtn tbtn-gray" onclick="openConfiguracoes()">⚙ Funções</button>
+    <button class="tbtn tbtn-gray" onclick="openGestaoPessoas()">👥 Equipe</button>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('escala',this)">📋 Escala</div>
+  <div class="tab" onclick="showTab('tarefas',this)">✅ Tarefas</div>
+  <div class="tab" onclick="showTab('lembretes',this)">🗒 Lembretes</div>
+</div>
+
+<div class="toolbar" id="escala-toolbar">
+  <div style="display:flex;align-items:center;gap:6px;">
+    <button class="tbtn tbtn-gray" onclick="changeDay(-1)">◀</button>
+    <div id="date-display" style="font-size:13px;font-weight:500;color:var(--text-primary);min-width:170px;text-align:center;"></div>
+    <button class="tbtn tbtn-gray" onclick="changeDay(1)">▶</button>
+  </div>
+  <input type="date" id="date-picker" onchange="setDateFromPicker()" style="background:#2a2a2e;border:1px solid #444;border-radius:5px;color:#fff;padding:4px 8px;font-size:12px;">
+  <button class="tbtn tbtn-red" onclick="openAddSalaModal()">+ Nova sala</button>
+</div>
+
+<div class="conflict-bar hidden" id="conflict-bar">
+  <span style="font-weight:600;">⚠ Conflitos:</span>
+  <span id="conflict-items"></span>
+</div>
+
+<div id="tab-escala">
+  <div class="grid-wrap"><div class="grid" id="main-grid"></div></div>
+</div>
+
+<div id="tab-tarefas" style="display:none;">
+  <div class="tarefas-wrap">
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+      <button class="tbtn tbtn-red" onclick="openAddTarefaModal()">+ Nova tarefa</button>
+      <button class="tbtn tbtn-gray" onclick="openAddColunaModal()">+ Nova coluna</button>
+    </div>
+    <div class="tarefas-grid" id="tarefas-grid"></div>
+  </div>
+</div>
+
+<div id="tab-lembretes" style="display:none;">
+  <div class="lembretes-wrap">
+    <div style="margin-bottom:14px;">
+      <button class="tbtn tbtn-red" onclick="openAddLembreteModal()">+ Novo lembrete</button>
+    </div>
+    <div class="lembretes-grid" id="lembretes-grid"></div>
+  </div>
+</div>
+
+<div id="modal-root"></div>
+
+<script>
+let currentDate = new Date(2026,3,26);
+let activeTab = 'escala';
+
+let funcoes = [
+  {id:'f1',nome:'CÂMERA',bg:'#c0392b',text:'#ffffff'},
+  {id:'f2',nome:'TRANSMISSÃO',bg:'#c0392b',text:'#ffffff'},
+  {id:'f3',nome:'RESOLUME',bg:'#2980b9',text:'#ffffff'},
+  {id:'f4',nome:'DTV',bg:'#27ae60',text:'#ffffff'},
+  {id:'f5',nome:'ÁUDIO',bg:'#27ae60',text:'#ffffff'},
+  {id:'f6',nome:'ILUMINAÇÃO',bg:'#e6a817',text:'#1a1000'},
+  {id:'f7',nome:'DIREÇÃO',bg:'#8e44ad',text:'#ffffff'},
+  {id:'f8',nome:'FOTO',bg:'#16a085',text:'#ffffff'},
+];
+let nextFuncId=20;
+
+let pessoas=['PAULA','WELLINGTON','JOSE','MIRTES','HIGOR','CAUE','LUCAS','ELAINE','MARIA LUIZA','MIGUEL','IGOR','RYAN'];
+
+let salas={
+  '2026-04-26':[
+    {id:1,nome:'A4',evento:'CPF CODIGOS DA PROSPERIDADE',horario:'07:00',foto:null,rows:[
+      {fid:'f1',pessoa:''},{fid:'f1',pessoa:''},{fid:'f2',pessoa:'JOSE'},{fid:'f4',pessoa:'MIRTES'},{fid:'f5',pessoa:'HIGOR'}
+    ]},
+    {id:2,nome:'A5',evento:'MATEUS RIBEIRO',horario:'07:30',foto:null,rows:[
+      {fid:'f1',pessoa:'PAULA'},{fid:'f1',pessoa:''},{fid:'f3',pessoa:'WELLINGTON'},{fid:'f2',pessoa:''},{fid:'f4',pessoa:'CAUE'},{fid:'f5',pessoa:'LUCAS'}
+    ]},
+    {id:3,nome:'A1',evento:'CONSELHEIRO DAY',horario:'07:30 - 15:00',foto:null,rows:[
+      {fid:'f1',pessoa:''},{fid:'f1',pessoa:''},{fid:'f2',pessoa:'ELAINE'},{fid:'f3',pessoa:'MARIA LUIZA'},{fid:'f4',pessoa:'MIGUEL'},{fid:'f5',pessoa:'IGOR'}
+    ]},
+    {id:4,nome:'A7',evento:'',horario:'15:00 - 23:00',foto:null,rows:[
+      {fid:'f1',pessoa:''},{fid:'f1',pessoa:''},{fid:'f2',pessoa:'ELAINE'},{fid:'f3',pessoa:'MARIA LUIZA'},{fid:'f4',pessoa:'MIGUEL'},{fid:'f5',pessoa:'IGOR'},{fid:'f6',pessoa:'RYAN'}
+    ]},
+  ]
+};
+let nextSalaId=10;
+
+let colunasTarefa=[
+  {id:'c1',nome:'A FAZER',cor:'#555'},
+  {id:'c2',nome:'EM ANDAMENTO',cor:'#2980b9'},
+  {id:'c3',nome:'FEITO',cor:'#27ae60'},
+];
+let tarefas=[
+  {id:'t1',titulo:'Testar sistema de som A1',coluna:'c1',responsavel:'IGOR',prazo:'2026-04-26',foto:null,obs:''},
+  {id:'t2',titulo:'Checar cabos LED A5',coluna:'c2',responsavel:'CAUE',prazo:'2026-04-26',foto:null,obs:''},
+  {id:'t3',titulo:'Setup câmeras A4',coluna:'c3',responsavel:'PAULA',prazo:'2026-04-25',foto:null,obs:''},
+];
+let nextTarefaId=10;
+let nextColunaId=10;
+
+let lembretes=[
+  {id:'l1',texto:'Confirmar técnicos para o evento de domingo',tipo:'amarelo',data:'2026-04-24',foto:null},
+  {id:'l2',texto:'Comprar cabo HDMI reserva',tipo:'urgente',data:'2026-04-25',foto:null},
+  {id:'l3',texto:'Reunião de briefing 17h',tipo:'normal',data:'2026-04-26',foto:null},
+];
+let nextLembreteId=10;
+
+function dateKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function formatDateDisplay(d){
+  const dias=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+  const meses=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  return dias[d.getDay()]+', '+d.getDate()+' de '+meses[d.getMonth()]+' de '+d.getFullYear();
+}
+function changeDay(delta){currentDate.setDate(currentDate.getDate()+delta);renderEscala();}
+function setDateFromPicker(){const v=document.getElementById('date-picker').value;if(v){const p=v.split('-');currentDate=new Date(+p[0],+p[1]-1,+p[2]);}renderEscala();}
+function getSalas(){const k=dateKey(currentDate);if(!salas[k])salas[k]=[];return salas[k];}
+function getFuncao(fid){return funcoes.find(f=>f.id===fid)||{nome:'?',bg:'#555',text:'#fff'};}
+
+function getConflicts(){
+  const list=getSalas(),map={};
+  list.forEach(sala=>sala.rows.forEach(row=>{if(row.pessoa){if(!map[row.pessoa])map[row.pessoa]=[];map[row.pessoa].push(sala.nome);}}));
+  return Object.entries(map).filter(([p,ss])=>[...new Set(ss)].length>1).map(([p,ss])=>({pessoa:p,salas:[...new Set(ss)]}));
+}
+function isConflict(pessoa){return pessoa&&getConflicts().some(c=>c.pessoa===pessoa);}
+
+function showTab(tab,el){
+  activeTab=tab;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('escala-toolbar').style.display=tab==='escala'?'flex':'none';
+  document.getElementById('conflict-bar').style.display=tab==='escala'?'':'none';
+  document.getElementById('tab-escala').style.display=tab==='escala'?'':'none';
+  document.getElementById('tab-tarefas').style.display=tab==='tarefas'?'':'none';
+  document.getElementById('tab-lembretes').style.display=tab==='lembretes'?'':'none';
+  if(tab==='tarefas')renderTarefas();
+  if(tab==='lembretes')renderLembretes();
+}
+
+function renderEscala(){
+  document.getElementById('date-display').textContent=formatDateDisplay(currentDate);
+  document.getElementById('date-picker').value=dateKey(currentDate);
+  const conflicts=getConflicts();
+  const bar=document.getElementById('conflict-bar');
+  if(conflicts.length){bar.classList.remove('hidden');document.getElementById('conflict-items').innerHTML=conflicts.map(c=>`<span class="conflict-item">⚠ ${c.pessoa} → ${c.salas.join(' + ')}</span>`).join(' ');}
+  else bar.classList.add('hidden');
+  const grid=document.getElementById('main-grid');
+  const list=getSalas();
+  if(!list.length){grid.innerHTML=`<div class="empty-state"><span>📋</span><div>Nenhuma sala para este dia.</div><div style="font-size:12px;margin-top:4px;">Clique em <strong>+ Nova sala</strong> para começar.</div></div>`;return;}
+  grid.innerHTML=list.map(sala=>renderSala(sala)).join('');
+  list.forEach(sala=>{
+    const col=document.querySelector(`[data-sala="${sala.id}"]`);if(!col)return;
+    col.querySelectorAll('.person-select').forEach((sel,ri)=>{if(sala.rows[ri])sel.value=sala.rows[ri].pessoa||'';});
+    col.querySelectorAll('.func-select').forEach((sel,ri)=>{if(sala.rows[ri])sel.value=sala.rows[ri].fid;});
+  });
+}
+
+function renderSala(sala){
+  const hasConflict=sala.rows.some(r=>isConflict(r.pessoa));
+  const pessoaOpts=['<option value="">— sem técnico —</option>',...pessoas.map(p=>`<option value="${p}">${p}</option>`)].join('');
+  const funcOpts=funcoes.map(f=>`<option value="${f.id}">${f.nome}</option>`).join('');
+  const fotoHtml=sala.foto
+    ?`<img src="${sala.foto}" class="sala-photo" onclick="openAddSalaModal(${sala.id})">`
+    :`<div class="sala-photo-placeholder" onclick="triggerFotoUpload('sala',${sala.id})">📷 Adicionar foto</div>`;
+  const rows=sala.rows.map((row,ri)=>{
+    const f=getFuncao(row.fid);
+    const conflict=isConflict(row.pessoa);
+    return `<div class="func-row">
+      <select class="func-select" onchange="changeFunc(${sala.id},${ri},this.value)" style="background:${f.bg};color:${f.text};">${funcOpts}</select>
+      <select class="person-select${conflict?' conflict-select':''}" onchange="changePessoa(${sala.id},${ri},this.value)">${pessoaOpts}</select>
+      <button class="remove-row-btn" onclick="removeRow(${sala.id},${ri})">×</button>
+    </div>`;
+  }).join('');
+  return `<div class="sala-col${hasConflict?' conflict-col':''}" data-sala="${sala.id}">
+    <div class="sala-name-row">
+      <span class="sala-name">${sala.nome}</span>
+      <div class="sala-controls">
+        <button class="sala-btn" onclick="openAddSalaModal(${sala.id})">✎</button>
+        <button class="sala-btn" onclick="removeSala(${sala.id})" style="background:rgba(255,80,80,0.3);">×</button>
+      </div>
+    </div>
+    <div class="sala-event-row">
+      <div class="sala-event-name">${sala.evento||'<span style="color:#555">— sem evento —</span>'}</div>
+      <div class="sala-time">${sala.horario||''}</div>
+    </div>
+    ${fotoHtml}
+    <div class="rows-area">${rows}<button class="add-func-btn" onclick="addRow(${sala.id})">+ adicionar função</button></div>
+  </div>`;
+}
+
+function changeFunc(salaId,ri,fid){const s=getSalas().find(s=>s.id===salaId);if(s)s.rows[ri].fid=fid;renderEscala();}
+function changePessoa(salaId,ri,val){const s=getSalas().find(s=>s.id===salaId);if(s)s.rows[ri].pessoa=val;renderEscala();}
+function addRow(salaId){const s=getSalas().find(s=>s.id===salaId);if(s)s.rows.push({fid:funcoes[0]?.id,pessoa:''});renderEscala();}
+function removeRow(salaId,ri){const s=getSalas().find(s=>s.id===salaId);if(s)s.rows.splice(ri,1);renderEscala();}
+function removeSala(salaId){if(!confirm('Remover esta sala?'))return;const k=dateKey(currentDate);salas[k]=(salas[k]||[]).filter(s=>s.id!==salaId);renderEscala();}
+
+function triggerFotoUpload(tipo,id){
+  const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
+  inp.onchange=e=>{
+    const file=e.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      if(tipo==='sala'){const s=getSalas().find(s=>s.id===id);if(s)s.foto=ev.target.result;renderEscala();}
+      else if(tipo==='tarefa'){const t=tarefas.find(t=>t.id===id);if(t){t.foto=ev.target.result;renderTarefas();}}
+      else if(tipo==='lembrete'){const l=lembretes.find(l=>l.id===id);if(l){l.foto=ev.target.result;renderLembretes();}}
+    };
+    reader.readAsDataURL(file);
+  };
+  inp.click();
+}
+
+function renderTarefas(){
+  const grid=document.getElementById('tarefas-grid');
+  grid.innerHTML=colunasTarefa.map(col=>{
+    const items=tarefas.filter(t=>t.coluna===col.id);
+    return `<div class="tarefa-col">
+      <div class="tarefa-col-header" style="border-left:4px solid ${col.cor};">
+        <span class="tarefa-col-title">${col.nome} <span style="color:var(--text-secondary);font-weight:400;">(${items.length})</span></span>
+        <button class="remove-row-btn" onclick="removeColuna('${col.id}')">×</button>
+      </div>
+      ${items.map(t=>{
+        const done=col.id==='c3';
+        const fotoHtml=t.foto?`<img src="${t.foto}" class="tarefa-photo">`:'';
+        return `<div class="tarefa-item${done?' tarefa-done':''}" onclick="openEditTarefaModal('${t.id}')">
+          <div class="tarefa-title">${t.titulo}</div>
+          <div class="tarefa-meta">
+            ${t.responsavel?`<span>👤 ${t.responsavel}</span>`:''}
+            ${t.prazo?`<span>📅 ${t.prazo}</span>`:''}
+          </div>
+          ${t.obs?`<div style="font-size:11px;color:var(--text-secondary);margin-top:4px;">${t.obs}</div>`:''}
+          ${fotoHtml}
+        </div>`;
+      }).join('')}
+      <button class="add-tarefa-btn" onclick="openAddTarefaModal('${col.id}')">+ adicionar tarefa</button>
+    </div>`;
+  }).join('');
+}
+
+function renderLembretes(){
+  const grid=document.getElementById('lembretes-grid');
+  const tipoClass={amarelo:'',urgente:'urgente',normal:'normal'};
+  grid.innerHTML=lembretes.map(l=>`
+    <div class="lembrete-card ${tipoClass[l.tipo]||''}" onclick="openEditLembreteModal('${l.id}')">
+      <button class="lembrete-del" onclick="event.stopPropagation();removeLembrete('${l.id}')">×</button>
+      <div class="lembrete-text">${l.texto}</div>
+      ${l.data?`<div class="lembrete-date">📅 ${l.data}</div>`:''}
+      ${l.foto?`<img src="${l.foto}" class="lembrete-photo">`:''}
+    </div>`).join('')
+  +`<button class="add-lembrete-btn" onclick="openAddLembreteModal()">+ Novo lembrete</button>`;
+}
+function removeLembrete(id){if(!confirm('Remover lembrete?'))return;lembretes=lembretes.filter(l=>l.id!==id);renderLembretes();}
+
+function closeModal(){document.getElementById('modal-root').innerHTML='';}
+
+function triggerFotoUploadModal(){
+  const inp=document.createElement('input');inp.type='file';inp.accept='image/*';
+  inp.onchange=e=>{
+    const file=e.target.files[0];if(!file)return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      window._modalFoto=ev.target.result;
+      let prev=document.getElementById('foto-preview-img');
+      if(!prev){prev=document.createElement('img');prev.id='foto-preview-img';prev.className='photo-preview';document.getElementById('modal-foto-preview').appendChild(prev);}
+      prev.src=ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+  inp.click();
+}
+
+function openAddSalaModal(editId=null){
+  const k=dateKey(currentDate);
+  const ex=editId?(salas[k]||[]).find(s=>s.id===editId):null;
+  document.getElementById('modal-root').innerHTML=`
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3>${ex?'Editar sala':'Nova sala'}</h3>
+      <label>Nome da sala</label><input id="m-nome" value="${ex?ex.nome:''}" placeholder="Ex: A1">
+      <label>Nome do evento</label><input id="m-evento" value="${ex?ex.evento:''}" placeholder="Ex: Formatura ESPM">
+      <label>Horário</label><input id="m-horario" value="${ex?ex.horario:''}" placeholder="Ex: 07:00 - 23:00">
+      <label>Foto do evento</label>
+      <div class="photo-upload-area" onclick="triggerFotoUploadModal()">📷 Clique para adicionar uma foto</div>
+      <div id="modal-foto-preview">${ex&&ex.foto?`<img src="${ex.foto}" class="photo-preview" id="foto-preview-img">`:''}</div>
+      <div class="modal-footer">
+        ${ex?`<button class="btn-danger" onclick="removeSala(${editId});closeModal()">Excluir</button>`:''}
+        <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+        <button class="btn-confirm" onclick="saveSala(${editId||'null'})">${ex?'Salvar':'Criar'}</button>
+      </div>
+    </div>
+  </div>`;
+  window._modalFoto=ex?ex.foto:null;
+}
+
+function saveSala(editId){
+  const nome=document.getElementById('m-nome').value.trim();
+  const evento=document.getElementById('m-evento').value.trim();
+  const horario=document.getElementById('m-horario').value.trim();
+  if(!nome){alert('Informe o nome da sala.');return;}
+  const k=dateKey(currentDate);if(!salas[k])salas[k]=[];
+  if(editId){const s=salas[k].find(s=>s.id===editId);if(s){s.nome=nome;s.evento=evento;s.horario=horario;if(window._modalFoto)s.foto=window._modalFoto;}}
+  else salas[k].push({id:nextSalaId++,nome,evento,horario,foto:window._modalFoto||null,rows:[{fid:funcoes[0]?.id,pessoa:''},{fid:funcoes[4]?.id||funcoes[0]?.id,pessoa:''}]});
+  closeModal();renderEscala();
+}
+
+function openAddTarefaModal(colunaId=null){
+  window._modalFoto=null;
+  document.getElementById('modal-root').innerHTML=`
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3>Nova tarefa</h3>
+      <label>Título</label><input id="t-titulo" placeholder="Descreva a tarefa">
+      <label>Coluna</label>
+      <select id="t-coluna">${colunasTarefa.map(c=>`<option value="${c.id}" ${c.id===colunaId?'selected':''}>${c.nome}</option>`).join('')}</select>
+      <label>Responsável</label>
+      <select id="t-resp"><option value="">— nenhum —</option>${pessoas.map(p=>`<option>${p}</option>`).join('')}</select>
+      <label>Prazo</label><input id="t-prazo" type="date">
+      <label>Observação</label><textarea id="t-obs" placeholder="Detalhes adicionais..."></textarea>
+      <label>Foto</label>
+      <div class="photo-upload-area" onclick="triggerFotoUploadModal()">📷 Adicionar foto</div>
+      <div id="modal-foto-preview"></div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+        <button class="btn-confirm" onclick="saveTarefa(null)">Criar tarefa</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function openEditTarefaModal(tid){
+  const t=tarefas.find(t=>t.id===tid);if(!t)return;
+  window._modalFoto=t.foto||null;
+  document.getElementById('modal-root').innerHTML=`
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3>Editar tarefa</h3>
+      <label>Título</label><input id="t-titulo" value="${t.titulo}">
+      <label>Coluna</label>
+      <select id="t-coluna">${colunasTarefa.map(c=>`<option value="${c.id}" ${c.id===t.coluna?'selected':''}>${c.nome}</option>`).join('')}</select>
+      <label>Responsável</label>
+      <select id="t-resp"><option value="">— nenhum —</option>${pessoas.map(p=>`<option ${p===t.responsavel?'selected':''}>${p}</option>`).join('')}</select>
+      <label>Prazo</label><input id="t-prazo" type="date" value="${t.prazo||''}">
+      <label>Observação</label><textarea id="t-obs">${t.obs||''}</textarea>
+      <label>Foto</label>
+      <div class="photo-upload-area" onclick="triggerFotoUploadModal()">📷 ${t.foto?'Trocar foto':'Adicionar foto'}</div>
+      <div id="modal-foto-preview">${t.foto?`<img src="${t.foto}" class="photo-preview" id="foto-preview-img">`:''}</div>
+      <div class="modal-footer">
+        <button class="btn-danger" onclick="removeTarefa('${tid}')">Excluir</button>
+        <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+        <button class="btn-confirm" onclick="saveTarefa('${tid}')">Salvar</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function saveTarefa(tid){
+  const titulo=document.getElementById('t-titulo').value.trim();
+  if(!titulo){alert('Informe o título.');return;}
+  const coluna=document.getElementById('t-coluna').value;
+  const responsavel=document.getElementById('t-resp').value;
+  const prazo=document.getElementById('t-prazo').value;
+  const obs=document.getElementById('t-obs').value;
+  if(tid){const t=tarefas.find(t=>t.id===tid);if(t){t.titulo=titulo;t.coluna=coluna;t.responsavel=responsavel;t.prazo=prazo;t.obs=obs;if(window._modalFoto)t.foto=window._modalFoto;}}
+  else tarefas.push({id:'t'+nextTarefaId++,titulo,coluna,responsavel,prazo,obs,foto:window._modalFoto||null});
+  closeModal();renderTarefas();
+}
+function removeTarefa(tid){if(!confirm('Remover?'))return;tarefas=tarefas.filter(t=>t.id!==tid);closeModal();renderTarefas();}
+
+function openAddColunaModal(){
+  document.getElementById('modal-root').innerHTML=`
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3>Nova coluna</h3>
+      <label>Nome</label><input id="c-nome" placeholder="Ex: REVISÃO">
+      <label>Cor</label>
+      <div style="position:relative;width:40px;height:34px;border-radius:6px;overflow:hidden;border:1px solid #555;margin-top:4px;">
+        <input type="color" id="c-cor" value="#e67e22" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);border:none;cursor:pointer;padding:0;">
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+        <button class="btn-confirm" onclick="saveColuna()">Criar</button>
+      </div>
+    </div>
+  </div>`;
+}
+function saveColuna(){
+  const nome=document.getElementById('c-nome').value.trim().toUpperCase();
+  const cor=document.getElementById('c-cor').value;
+  if(!nome)return;
+  colunasTarefa.push({id:'c'+nextColunaId++,nome,cor});
+  closeModal();renderTarefas();
+}
+function removeColuna(cid){if(!confirm('Remover coluna e suas tarefas?'))return;colunasTarefa=colunasTarefa.filter(c=>c.id!==cid);tarefas=tarefas.filter(t=>t.coluna!==cid);renderTarefas();}
+
+function openAddLembreteModal(editId=null){
+  const ex=editId?lembretes.find(l=>l.id===editId):null;
+  window._modalFoto=ex?ex.foto:null;
+  document.getElementById('modal-root').innerHTML=`
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3>${ex?'Editar lembrete':'Novo lembrete'}</h3>
+      <label>Texto</label><textarea id="l-texto" placeholder="Escreva o lembrete...">${ex?ex.texto:''}</textarea>
+      <label>Tipo</label>
+      <select id="l-tipo">
+        <option value="amarelo" ${ex&&ex.tipo==='amarelo'?'selected':''}>🟡 Amarelo</option>
+        <option value="urgente" ${ex&&ex.tipo==='urgente'?'selected':''}>🔴 Urgente</option>
+        <option value="normal" ${ex&&ex.tipo==='normal'?'selected':''}>🟢 Normal</option>
+      </select>
+      <label>Data</label><input id="l-data" type="date" value="${ex?ex.data:''}">
+      <label>Foto</label>
+      <div class="photo-upload-area" onclick="triggerFotoUploadModal()">📷 ${ex&&ex.foto?'Trocar foto':'Adicionar foto'}</div>
+      <div id="modal-foto-preview">${ex&&ex.foto?`<img src="${ex.foto}" class="photo-preview" id="foto-preview-img">`:''}</div>
+      <div class="modal-footer">
+        ${ex?`<button class="btn-danger" onclick="removeLembrete('${editId}');closeModal()">Excluir</button>`:''}
+        <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+        <button class="btn-confirm" onclick="saveLembrete('${editId||'null'}')">${ex?'Salvar':'Criar'}</button>
+      </div>
+    </div>
+  </div>`;
+}
+function openEditLembreteModal(id){openAddLembreteModal(id);}
+function saveLembrete(eid){
+  const texto=document.getElementById('l-texto').value.trim();
+  if(!texto){alert('Escreva o lembrete.');return;}
+  const tipo=document.getElementById('l-tipo').value;
+  const data=document.getElementById('l-data').value;
+  if(eid&&eid!=='null'){const l=lembretes.find(l=>l.id===eid);if(l){l.texto=texto;l.tipo=tipo;l.data=data;if(window._modalFoto)l.foto=window._modalFoto;}}
+  else lembretes.push({id:'l'+nextLembreteId++,texto,tipo,data,foto:window._modalFoto||null});
+  closeModal();renderLembretes();
+}
+
+function openGestaoPessoas(){
+  document.getElementById('modal-root').innerHTML=`
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <h3>👥 Equipe</h3>
+      <div id="pessoas-list" class="pessoas-list">${renderPTags()}</div>
+      <div style="display:flex;gap:6px;margin-top:8px;">
+        <input id="m-pessoa" placeholder="Nome do técnico" style="flex:1;" onkeydown="if(event.key==='Enter')addPessoa()">
+        <button class="btn-confirm" onclick="addPessoa()">+ Adicionar</button>
+      </div>
+      <div class="modal-footer"><button class="btn-confirm" onclick="closeModal()">Fechar</button></div>
+    </div>
+  </div>`;
+}
+function renderPTags(){return pessoas.map((p,i)=>`<div class="pessoa-tag">${p}<button onclick="removePessoa(${i})">×</button></div>`).join('');}
+function addPessoa(){const inp=document.getElementById('m-pessoa');const n=inp.value.trim().toUpperCase();if(!n||pessoas.includes(n))return;pessoas.push(n);inp.value='';document.getElementById('pessoas-list').innerHTML=renderPTags();}
+function removePessoa(i){pessoas.splice(i,1);document.getElementById('pessoas-list').innerHTML=renderPTags();}
+
+function openConfiguracoes(){
+  document.getElementById('modal-root').innerHTML=`
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal" style="width:430px;">
+      <h3>⚙ Configurar funções</h3>
+      <p style="font-size:12px;color:#888;margin-bottom:8px;">Clique no quadrado colorido para mudar a cor.</p>
+      <div class="func-config-list" id="func-config-list">${renderFuncConfig()}</div>
+      <div style="border-top:1px solid #333;margin-top:10px;padding-top:12px;">
+        <div style="font-size:11px;color:#888;margin-bottom:6px;">NOVA FUNÇÃO</div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <input id="nf-nome" placeholder="Nome da função" style="flex:1;">
+          <div style="position:relative;width:36px;height:32px;border-radius:6px;overflow:hidden;border:1px solid #555;">
+            <input type="color" id="nf-bg" value="#9b59b6" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);opacity:0;cursor:pointer;">
+            <div id="nf-bg-prev" style="position:absolute;inset:0;background:#9b59b6;pointer-events:none;border-radius:5px;"></div>
+          </div>
+          <div style="position:relative;width:36px;height:32px;border-radius:6px;overflow:hidden;border:1px solid #555;">
+            <input type="color" id="nf-text" value="#ffffff" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);opacity:0;cursor:pointer;">
+            <div id="nf-text-prev" style="position:absolute;inset:0;background:#ffffff;pointer-events:none;border-radius:5px;"></div>
+          </div>
+          <button class="btn-confirm" onclick="addFuncao()">+ Criar</button>
+        </div>
+        <div style="font-size:10px;color:#555;margin-top:4px;">1º quadrado = cor de fundo · 2º = cor do texto</div>
+      </div>
+      <div class="modal-footer"><button class="btn-confirm" onclick="closeModal();renderEscala();">Fechar</button></div>
+    </div>
+  </div>`;
+  document.getElementById('nf-bg').addEventListener('input',e=>{document.getElementById('nf-bg-prev').style.background=e.target.value;});
+  document.getElementById('nf-text').addEventListener('input',e=>{document.getElementById('nf-text-prev').style.background=e.target.value;});
+}
+function renderFuncConfig(){
+  return funcoes.map(f=>`
+    <div class="func-config-item" id="fci-${f.id}">
+      <div style="position:relative;width:38px;height:30px;border-radius:5px;overflow:hidden;border:1px solid #444;cursor:pointer;">
+        <div style="position:absolute;inset:0;background:${f.bg};pointer-events:none;border-radius:4px;"></div>
+        <input type="color" value="${f.bg}" oninput="updateFuncBg('${f.id}',this.value)" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);opacity:0;cursor:pointer;">
+      </div>
+      <div style="position:relative;width:28px;height:28px;border-radius:5px;overflow:hidden;border:1px solid #444;cursor:pointer;">
+        <div style="position:absolute;inset:0;background:${f.text};pointer-events:none;border-radius:4px;"></div>
+        <input type="color" value="${f.text}" oninput="updateFuncText('${f.id}',this.value)" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);opacity:0;cursor:pointer;">
+      </div>
+      <div style="flex:1;background:${f.bg};color:${f.text};padding:5px 9px;border-radius:5px;font-size:11px;font-weight:600;text-transform:uppercase;" id="flabel-${f.id}">${f.nome}</div>
+      <input value="${f.nome}" onchange="renameFuncao('${f.id}',this.value)" style="width:90px;background:#111;border:1px solid #333;border-radius:5px;color:#eee;padding:4px 7px;font-size:11px;font-family:var(--font);">
+      <button class="func-del-btn" onclick="deleteFuncao('${f.id}')">×</button>
+    </div>`).join('');
+}
+function updateFuncBg(fid,color){const f=funcoes.find(f=>f.id===fid);if(!f)return;f.bg=color;const lbl=document.getElementById('flabel-'+fid);if(lbl)lbl.style.background=color;const item=document.getElementById('fci-'+fid);if(item){const divs=item.querySelectorAll('div[style*="pointer-events:none"]');if(divs[0])divs[0].style.background=color;}}
+function updateFuncText(fid,color){const f=funcoes.find(f=>f.id===fid);if(!f)return;f.text=color;const lbl=document.getElementById('flabel-'+fid);if(lbl)lbl.style.color=color;const item=document.getElementById('fci-'+fid);if(item){const divs=item.querySelectorAll('div[style*="pointer-events:none"]');if(divs[1])divs[1].style.background=color;}}
+function renameFuncao(fid,nome){const f=funcoes.find(f=>f.id===fid);if(f){f.nome=nome.trim().toUpperCase();const lbl=document.getElementById('flabel-'+fid);if(lbl)lbl.textContent=f.nome;}}
+function deleteFuncao(fid){if(!confirm('Remover função?'))return;funcoes=funcoes.filter(f=>f.id!==fid);document.getElementById('func-config-list').innerHTML=renderFuncConfig();}
+function addFuncao(){const nome=document.getElementById('nf-nome').value.trim().toUpperCase();const bg=document.getElementById('nf-bg').value;const text=document.getElementById('nf-text').value;if(!nome){alert('Informe o nome.');return;}funcoes.push({id:'f'+nextFuncId++,nome,bg,text});document.getElementById('nf-nome').value='';document.getElementById('func-config-list').innerHTML=renderFuncConfig();}
+
+const FONTS=['DM Sans','Inter','Roboto','Poppins','Montserrat'];
+const FONT_SIZES=['11px','12px','13px','14px','15px','16px'];
+
+function openTema(){
+  const root=document.documentElement;
+  function getVar(v){return getComputedStyle(root).getPropertyValue(v).trim();}
+  function toHex(v){if(!v)return'#888888';if(v.startsWith('#'))return v;const m=v.match(/\d+/g);if(!m||m.length<3)return'#888888';return'#'+m.slice(0,3).map(x=>parseInt(x).toString(16).padStart(2,'0')).join('');}
+  const cur={bgMain:toHex(getVar('--bg-main')||'#1c1c1e'),bgCard:toHex(getVar('--bg-card')||'#242428'),accent:toHex(getVar('--accent')||'#e63946'),textPrimary:toHex(getVar('--text-primary')||'#f0f0f0'),textSecondary:toHex(getVar('--text-secondary')||'#888888')};
+  document.getElementById('modal-root').innerHTML=`
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal" style="width:420px;">
+      <h3>🎨 Tema da interface</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px;">
+        ${colorField('Fundo principal','--bg-main',cur.bgMain)}
+        ${colorField('Fundo dos cards','--bg-card',cur.bgCard)}
+        ${colorField('Cor de destaque','--accent',cur.accent)}
+        ${colorField('Texto principal','--text-primary',cur.textPrimary)}
+        ${colorField('Texto secundário','--text-secondary',cur.textSecondary)}
+      </div>
+      <div style="margin-top:14px;border-top:1px solid #333;padding-top:12px;">
+        <div style="font-size:11px;color:#888;margin-bottom:6px;">FONTE</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div>
+            <label style="font-size:11px;color:#888;display:block;margin-bottom:4px;">Família</label>
+            <select id="font-family-sel" onchange="applyFont()" style="width:100%;background:#1a1a1e;border:1px solid #333;border-radius:6px;color:#f0f0f0;padding:7px 10px;font-size:13px;">
+              ${FONTS.map(f=>`<option value="'${f}',sans-serif">${f}</option>`).join('')}
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;color:#888;display:block;margin-bottom:4px;">Tamanho</label>
+            <select id="font-size-sel" onchange="applyFont()" style="width:100%;background:#1a1a1e;border:1px solid #333;border-radius:6px;color:#f0f0f0;padding:7px 10px;font-size:13px;">
+              ${FONT_SIZES.map(s=>`<option value="${s}">${s.replace('px',' px')}</option>`).join('')}
+            </select>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px;border-top:1px solid #333;padding-top:12px;">
+        <div style="font-size:11px;color:#888;margin-bottom:8px;">PRESETS RÁPIDOS</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="tbtn tbtn-gray" onclick="applyPreset('dark')">🌑 Escuro</button>
+          <button class="tbtn tbtn-gray" onclick="applyPreset('light')">☀ Claro</button>
+          <button class="tbtn tbtn-gray" onclick="applyPreset('blue')">🔵 Azul</button>
+          <button class="tbtn tbtn-gray" onclick="applyPreset('green')">🟢 Verde</button>
+        </div>
+      </div>
+      <div class="modal-footer"><button class="btn-cancel" onclick="closeModal()">Fechar</button></div>
+    </div>
+  </div>`;
+}
+function colorField(label,varName,value){
+  const id='prev'+varName.replace(/-/g,'_');
+  return `<div>
+    <div style="font-size:11px;color:#888;margin-bottom:5px;">${label}</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div style="position:relative;width:38px;height:32px;border-radius:6px;overflow:hidden;border:1px solid #555;">
+        <div style="position:absolute;inset:0;background:${value};pointer-events:none;" id="${id}"></div>
+        <input type="color" value="${value}" oninput="applyColor('${varName}',this.value,'${id}')" style="position:absolute;inset:-4px;width:calc(100%+8px);height:calc(100%+8px);opacity:0;cursor:pointer;">
+      </div>
+      <span style="font-size:12px;color:#ccc;">${value}</span>
+    </div>
+  </div>`;
+}
+function applyColor(varName,value,prevId){document.documentElement.style.setProperty(varName,value);const p=document.getElementById(prevId);if(p)p.style.background=value;}
+function applyFont(){const fam=document.getElementById('font-family-sel').value;const sz=document.getElementById('font-size-sel').value;document.documentElement.style.setProperty('--font',fam);document.documentElement.style.setProperty('--font-size',sz);}
+function applyPreset(name){
+  const presets={
+    dark:{'--bg-main':'#1c1c1e','--bg-card':'#242428','--accent':'#e63946','--text-primary':'#f0f0f0','--text-secondary':'#888888'},
+    light:{'--bg-main':'#f5f5f7','--bg-card':'#ffffff','--accent':'#e63946','--text-primary':'#1a1a1a','--text-secondary':'#666666'},
+    blue:{'--bg-main':'#0a0f1e','--bg-card':'#111827','--accent':'#3b82f6','--text-primary':'#e8eaf6','--text-secondary':'#7986cb'},
+    green:{'--bg-main':'#0a1a0f','--bg-card':'#0f2a18','--accent':'#22c55e','--text-primary':'#e8f5e9','--text-secondary':'#81c784'},
+  };
+  const p=presets[name];if(!p)return;
+  Object.entries(p).forEach(([k,v])=>document.documentElement.style.setProperty(k,v));
+  closeModal();openTema();
+}
+
+renderEscala();
+</script>
+</body>
+</html>
